@@ -21,17 +21,25 @@
 </head>
 
 <body>
+
   <div class="bg-orb orb-a"></div>
   <div class="bg-orb orb-b"></div>
 
+  <!-- TOP NAVIGATION -->
   <header class="topbar">
     <a class="brand" href="#/">
-      <span class="brand-mark">DT</span>
+
+      <img
+        class="brand-logo"
+        src="./logo.png"
+        alt="Central University of Odisha"
+      />
 
       <span class="brand-text">
         <strong>Dairy Technology</strong>
         <small>B.Tech study library</small>
       </span>
+
     </a>
 
     <nav class="top-nav">
@@ -42,35 +50,236 @@
     </nav>
   </header>
 
+  <!-- MAIN APP -->
   <main id="app" class="app"></main>
 
+  <!-- INSTALL APP POPUP -->
+  <div id="installPopup" class="install-popup" hidden>
+
+    <div class="install-card">
+
+      <button
+        id="installClose"
+        class="install-close"
+        type="button"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div class="install-icon">
+        <img src="./logo.png" alt="Dairy Tech Notes" />
+      </div>
+
+      <div class="install-content">
+
+        <h2>Install Dairy Tech Notes</h2>
+
+        <p>
+          📚 Apne B.Tech Dairy Technology ke Notes, PPT aur Textbook
+          ko ek app ki tarah easily access karo.
+        </p>
+
+        <div class="install-actions">
+
+          <button
+            id="installNow"
+            class="btn install-now"
+            type="button"
+          >
+            📲 Install Now
+          </button>
+
+          <button
+            id="installLater"
+            class="btn ghost"
+            type="button"
+          >
+            Maybe Later
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
   <footer class="site-foot">
     <p>
       Made by <strong>Swet Sanket</strong> · B.Tech Dairy Technology
     </p>
   </footer>
 
+  <!-- MAIN APP JAVASCRIPT -->
   <script src="js/app.js"></script>
 
+  <!-- PWA INSTALL + SERVICE WORKER -->
   <script>
+
+    let deferredPrompt = null;
+
+    const installPopup = document.getElementById("installPopup");
+    const installNow = document.getElementById("installNow");
+    const installLater = document.getElementById("installLater");
+    const installClose = document.getElementById("installClose");
+
+    function hideInstallPopup() {
+      if (installPopup) {
+        installPopup.hidden = true;
+      }
+    }
+
+    function closeInstallPopup() {
+      hideInstallPopup();
+
+      try {
+        localStorage.setItem("installPopupClosed", "true");
+      } catch (error) {
+        console.log("Could not save install popup state.");
+      }
+    }
+
+    function showInstallPopup() {
+
+      let alreadyClosed = false;
+
+      try {
+        alreadyClosed =
+          localStorage.getItem("installPopupClosed") === "true";
+      } catch (error) {
+        alreadyClosed = false;
+      }
+
+      if (alreadyClosed) {
+        return;
+      }
+
+      if (installPopup) {
+        installPopup.hidden = false;
+      }
+    }
+
+    /* Browser gives us the install option */
+    window.addEventListener("beforeinstallprompt", (event) => {
+
+      event.preventDefault();
+
+      deferredPrompt = event;
+
+      /*
+        Show our custom popup after around 2 seconds.
+      */
+      setTimeout(() => {
+        showInstallPopup();
+      }, 2000);
+
+    });
+
+    /* Install button */
+    if (installNow) {
+
+      installNow.addEventListener("click", async () => {
+
+        if (!deferredPrompt) {
+          return;
+        }
+
+        deferredPrompt.prompt();
+
+        const choice = await deferredPrompt.userChoice;
+
+        console.log(
+          "Install choice:",
+          choice.outcome
+        );
+
+        deferredPrompt = null;
+
+        hideInstallPopup();
+
+        if (choice.outcome === "accepted") {
+
+          try {
+            localStorage.setItem(
+              "installPopupClosed",
+              "true"
+            );
+          } catch (error) {}
+
+        }
+
+      });
+
+    }
+
+    /* Maybe Later */
+    if (installLater) {
+      installLater.addEventListener(
+        "click",
+        closeInstallPopup
+      );
+    }
+
+    /* X button */
+    if (installClose) {
+      installClose.addEventListener(
+        "click",
+        closeInstallPopup
+      );
+    }
+
+    /* App successfully installed */
+    window.addEventListener("appinstalled", () => {
+
+      deferredPrompt = null;
+
+      hideInstallPopup();
+
+      try {
+        localStorage.setItem(
+          "installPopupClosed",
+          "true"
+        );
+      } catch (error) {}
+
+      console.log(
+        "Dairy Tech Notes installed successfully."
+      );
+
+    });
+
+    /* Register Service Worker */
     if ("serviceWorker" in navigator) {
+
       window.addEventListener("load", () => {
+
         navigator.serviceWorker
           .register("./service-worker.js")
           .then((registration) => {
+
             console.log(
               "Service Worker registered:",
               registration.scope
             );
+
           })
           .catch((error) => {
+
             console.error(
               "Service Worker registration failed:",
               error
             );
+
           });
+
       });
+
     }
+
   </script>
+
 </body>
 </html>
