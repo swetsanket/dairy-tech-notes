@@ -1,15 +1,19 @@
 {
   "name": "Dairy Tech Notes",
   "short_name": "DT Notes",
+  "id": "./",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f6efe4",
   "theme_color": "#1f6b4a",
+  "description": "B.Tech Dairy Technology Notes and Study App",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3145/3145765.png",
+      "src": "./logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
