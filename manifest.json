@@ -1,0 +1,15 @@
+{
+  "name": "Dairy Tech Notes",
+  "short_name": "DT Notes",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6efe4",
+  "theme_color": "#1f6b4a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3145/3145765.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
