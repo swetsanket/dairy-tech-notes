@@ -3,45 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <meta name="theme-color" content="#1f6b4a" />
   <link rel="manifest" href="./manifest.json" />
-
   <title>B.Tech Dairy Technology</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
-
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
-
   <div class="bg-orb orb-a"></div>
   <div class="bg-orb orb-b"></div>
 
   <!-- TOP NAVIGATION -->
   <header class="topbar">
     <a class="brand" href="#/">
-
-      <img
-        class="brand-logo"
-        src="./logo.png"
-        alt="Central University of Odisha"
-      />
-
+      <img class="brand-logo" src="./logo.png" alt="Central University of Odisha" />
       <span class="brand-text">
         <strong>Dairy Technology</strong>
         <small>B.Tech study library</small>
       </span>
-
     </a>
-
     <nav class="top-nav">
       <a href="#/notes">Notes</a>
       <a href="#/textbook">Textbook</a>
@@ -55,60 +37,83 @@
 
   <!-- INSTALL APP POPUP -->
   <div id="installPopup" class="install-popup" hidden>
-
     <div class="install-card">
-
-      <button
-        id="installClose"
-        class="install-close"
-        type="button"
-        aria-label="Close"
-      >
-        ×
-      </button>
-
+      <button id="installClose" class="install-close" type="button" aria-label="Close">×</button>
       <div class="install-icon">
         <img src="./logo.png" alt="Dairy Tech Notes" />
       </div>
-
       <div class="install-content">
-
         <h2>Install Dairy Tech Notes</h2>
-
-        <p>
-          📚 Apne B.Tech Dairy Technology ke Notes, PPT aur Textbook
-          ko ek app ki tarah easily access karo.
-        </p>
-
+        <p>📚 Apne B.Tech Dairy Technology ke Notes, PPT aur Textbook ko ek app ki tarah easily access karo.</p>
         <div class="install-actions">
-
-          <button
-            id="installNow"
-            class="btn install-now"
-            type="button"
-          >
-            📲 Install Now
-          </button>
-
-          <button
-            id="installLater"
-            class="btn ghost"
-            type="button"
-          >
-            Maybe Later
-          </button>
-
+          <button id="installNow" class="btn install-now" type="button">📲 Install Now</button>
+          <button id="installLater" class="btn ghost" type="button">Maybe Later</button>
         </div>
-
       </div>
-
     </div>
-
   </div>
 
-  <!-- FOOTER -->
   <footer class="site-foot">
-    <p>
+    <p>Made by <strong>Swet Sanket</strong> · B.Tech Dairy Technology</p>
+  </footer>
+
+  <!-- SUPABASE CLOUD DATABASE CONNECTION -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- MAIN APP JAVASCRIPT -->
+  <script src="js/app.js"></script>
+
+  <!-- PWA INSTALL + SERVICE WORKER -->
+  <script>
+    let deferredPrompt = null;
+    const installPopup = document.getElementById("installPopup");
+    const installNow = document.getElementById("installNow");
+    const installLater = document.getElementById("installLater");
+    const installClose = document.getElementById("installClose");
+
+    function hideInstallPopup() { if (installPopup) installPopup.hidden = true; }
+    function closeInstallPopup() {
+      hideInstallPopup();
+      try { localStorage.setItem("installPopupClosed", "true"); } catch (error) {}
+    }
+    function showInstallPopup() {
+      let alreadyClosed = false;
+      try { alreadyClosed = localStorage.getItem("installPopupClosed") === "true"; } catch (error) {}
+      if (alreadyClosed) return;
+      if (installPopup) installPopup.hidden = false;
+    }
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      setTimeout(() => { showInstallPopup(); }, 2000);
+    });
+    if (installNow) {
+      installNow.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        hideInstallPopup();
+        if (choice.outcome === "accepted") {
+          try { localStorage.setItem("installPopupClosed", "true"); } catch (error) {}
+        }
+      });
+    }
+    if (installLater) installLater.addEventListener("click", closeInstallPopup);
+    if (installClose) installClose.addEventListener("click", closeInstallPopup);
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      hideInstallPopup();
+      try { localStorage.setItem("installPopupClosed", "true"); } catch (error) {}
+    });
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(error => console.error(error));
+      });
+    }
+  </script>
+</body>
+</html>
       Made by <strong>Swet Sanket</strong> · B.Tech Dairy Technology
     </p>
   </footer>
