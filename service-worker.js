@@ -1,4 +1,4 @@
-const CACHE_NAME = "dairy-tech-notes-v1";
+const CACHE_NAME = "dairy-tech-notes-v2";
 
 const APP_SHELL = [
   "./",
